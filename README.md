@@ -74,9 +74,9 @@ UML diagram: [`design/class_diagram.mmd`](design/class_diagram.mmd)
 
 ## 📸 Demo
 
-<a href="/course_images/ai110/demo1.png" target="_blank"><img src='/course_images/ai110/demo1.png' title='PawPal App - Demo 1' width='' alt='PawPal App Demo 1' class='center-block' /></a>
+![PawPal App Demo 1](demo1.png)
 
-<a href="/course_images/ai110/demo2.png" target="_blank"><img src='/course_images/ai110/demo2.png' title='PawPal App - Demo 2' width='' alt='PawPal App Demo 2' class='center-block' /></a>
+![PawPal App Demo 2](demo2.png)
 
 ---
 
