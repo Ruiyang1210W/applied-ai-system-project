@@ -1,0 +1,44 @@
+flowchart TD
+    subgraph INPUT["INPUT"]
+        U["User: pet profile (species, age, notes)"]
+    end
+
+    subgraph RAG["RAG PIPELINE"]
+        KB[("Pet Knowledge Base")]
+        RET["Retriever: filter by species, age, notes"]
+        CTX["Retrieved Care Guidelines"]
+        LLM["Claude API: RAG Prompt"]
+        RESP["Task Suggestions (JSON)"]
+    end
+
+    subgraph HUMAN["HUMAN REVIEW"]
+        UI["Streamlit UI: Accept / Edit / Skip"]
+    end
+
+    subgraph CORE["PAWPAL CORE"]
+        PET["Pet: add_task()"]
+        SCH["Scheduler: generate_plan()"]
+        PLAN["Daily Schedule"]
+    end
+
+    subgraph OBS["LOGGING AND GUARDRAILS"]
+        LOG["pawpal_rag.log"]
+        GUARD["Guardrails: validate + cap output"]
+    end
+
+    U      -->|"species, age, notes"| RET
+    KB     -->|"all guidelines"| RET
+    RET    -->|"filtered docs"| CTX
+    CTX    -->|"context"| LLM
+    U      -->|"pet profile"| LLM
+    LLM    -->|"JSON task list"| RESP
+    RESP   --> UI
+    UI     -->|"accepted tasks"| PET
+    PET    --> SCH
+    SCH    --> PLAN
+
+    RET    -.->|"log retrieval"| LOG
+    LLM    -.->|"log prompt + response"| LOG
+    UI     -.->|"log user decision"| LOG
+    LLM    --- GUARD
+    GUARD  -.->|"log errors"| LOG

@@ -1,5 +1,40 @@
 # PawPal+ Project Reflection
 
+## 2. System Architecture (RAG Design)
+
+**System diagram:** [`design/system_diagram.mmd`](design/system_diagram.mmd)
+
+### Components and their roles
+
+| Component | File | What it does |
+|---|---|---|
+| **Pet Knowledge Base** | `pet_knowledge_base.py` | Static library of care guidelines organized by species, age group, and condition keywords. The source of ground-truth that the AI retrieves from. |
+| **Retriever** | `rag_advisor.py` | Filters the knowledge base using the pet's species, age group (puppy/adult/senior), and any keywords from the notes field. Returns the most relevant guidelines as plain text. |
+| **Claude API (LLM)** | `rag_advisor.py` | Receives the pet profile + retrieved docs in a structured prompt and returns a JSON list of task suggestions. This is the RAG step — the model's answer is grounded in retrieved context, not just training data. |
+| **Human Review UI** | `app.py` | Streamlit interface where the user sees each AI-suggested task and individually accepts, edits, or skips it before anything enters the scheduler. |
+| **PawPal Core** | `pawpal_system.py` | Existing `Pet`, `Owner`, `Scheduler` classes. Accepted tasks are added via `pet.add_task()` and flow into the existing scheduling pipeline unchanged. |
+| **Logger / Guardrails** | `rag_advisor.py` | Logs every retrieval query, prompt sent, response received, and user accept/reject decision to `pawpal_rag.log`. Guardrails cap task count, validate duration bounds, and provide a fallback if the API call fails. |
+
+### Data flow (input → process → output)
+
+```
+User enters pet (species, age, notes)
+    → Retriever filters Pet Knowledge Base → relevant care docs
+    → Claude API receives [pet profile + retrieved docs] → JSON task suggestions
+    → Streamlit UI shows suggestions → Human accepts / edits / skips each
+    → Accepted tasks → Pet.add_task() → Scheduler.generate_plan()
+    → Daily schedule with times, priorities, and conflict warnings
+```
+
+### Where humans check AI output
+
+The human review step sits between the LLM response and any change to the schedule. No AI-suggested task enters the system without explicit user approval. This means:
+- The AI cannot silently add a bad suggestion (e.g., a 4-hour task for a 5-minute bird)
+- The user sees the reasoning (retrieved guidelines are shown alongside suggestions)
+- The logger captures every accept/reject decision for auditability
+
+---
+
 ## 1. System Design
 
 **a. Initial design**
