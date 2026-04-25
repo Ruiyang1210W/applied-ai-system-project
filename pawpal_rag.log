@@ -1,0 +1,39 @@
+2026-04-24 11:57:07 [INFO] suggest_tasks | Luna | dog | age=2 | notes=''
+2026-04-24 11:57:07 [INFO] Retrieved 6 guidelines
+2026-04-24 11:57:07 [INFO] Prompt length: 1075 chars
+2026-04-24 11:57:19 [ERROR] suggest_tasks failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-04-24 11:57:35 [INFO] NumExpr defaulting to 12 threads.
+2026-04-24 12:08:01 [INFO] suggest_tasks | Luna | dog | age=2 | notes=''
+2026-04-24 12:08:01 [INFO] Retrieved 6 guidelines
+2026-04-24 12:08:01 [INFO] Prompt length: 1075 chars
+2026-04-24 12:08:01 [ERROR] suggest_tasks failed: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2026-04-24 12:10:46 [INFO] suggest_tasks | Luna | dog | age=2 | notes=''
+2026-04-24 12:10:46 [INFO] Retrieved 6 guidelines
+2026-04-24 12:10:46 [INFO] Prompt length: 1075 chars
+2026-04-24 12:10:50 [INFO] AFC is enabled with max remote calls: 10.
+2026-04-24 12:10:51 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 404 Not Found"
+2026-04-24 12:10:51 [ERROR] suggest_tasks failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.0-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.', 'status': 'NOT_FOUND'}}
+2026-04-24 12:11:24 [INFO] suggest_tasks | Luna | dog | age=2 | notes=''
+2026-04-24 12:11:24 [INFO] Retrieved 6 guidelines
+2026-04-24 12:11:24 [INFO] Prompt length: 1075 chars
+2026-04-24 12:11:28 [INFO] AFC is enabled with max remote calls: 10.
+2026-04-24 12:11:28 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent "HTTP/1.1 404 Not Found"
+2026-04-24 12:11:28 [ERROR] suggest_tasks failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.0-flash-lite is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.', 'status': 'NOT_FOUND'}}
+2026-04-24 12:11:47 [INFO] suggest_tasks | Luna | dog | age=2 | notes=''
+2026-04-24 12:11:47 [INFO] Retrieved 6 guidelines
+2026-04-24 12:11:47 [INFO] Prompt length: 1075 chars
+2026-04-24 12:11:50 [INFO] AFC is enabled with max remote calls: 10.
+2026-04-24 12:11:56 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-04-24 12:11:56 [INFO] Gemini response length: 671 chars
+2026-04-24 12:11:56 [INFO] Claude returned 4 raw suggestions
+2026-04-24 12:11:56 [INFO] Validated 4 suggestions
+2026-04-24 12:11:56 [INFO] Average confidence score: 1.00
+2026-04-24 12:12:59 [INFO] suggest_tasks | Luna | dog | age=2 | notes=''
+2026-04-24 12:12:59 [INFO] Retrieved 6 guidelines
+2026-04-24 12:12:59 [INFO] Prompt length: 1075 chars
+2026-04-24 12:13:06 [INFO] AFC is enabled with max remote calls: 10.
+2026-04-24 12:13:12 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-04-24 12:13:12 [INFO] Gemini response length: 663 chars
+2026-04-24 12:13:12 [INFO] Claude returned 4 raw suggestions
+2026-04-24 12:13:12 [INFO] Validated 4 suggestions
+2026-04-24 12:13:12 [INFO] Average confidence score: 1.00

@@ -1,13 +1,14 @@
 import base64
 import streamlit as st
 from pawpal_system import CareTask, Pet, Owner, Scheduler
+from rag_advisor import suggest_tasks
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
 
 # ---------------------------------------------------------------------------
 # Background image
 # ---------------------------------------------------------------------------
-with open("pets_bg.jpg", "rb") as f:
+with open("assets/pets_bg.jpg", "rb") as f:
     bg_data = base64.b64encode(f.read()).decode()
 
 st.markdown(
@@ -38,6 +39,10 @@ if "owner" not in st.session_state:
     st.session_state.owner = None
 if "scheduler" not in st.session_state:
     st.session_state.scheduler = None
+if "suggestions" not in st.session_state:
+    st.session_state.suggestions = []
+if "suggest_pet_name" not in st.session_state:
+    st.session_state.suggest_pet_name = None
 
 # ---------------------------------------------------------------------------
 # Title
@@ -191,9 +196,87 @@ else:
 st.divider()
 
 # ---------------------------------------------------------------------------
-# Section 4: Generate schedule
+# Section 4: AI Task Suggestions (RAG)
 # ---------------------------------------------------------------------------
-st.subheader("4. Generate Today's Schedule")
+st.subheader("4. Get AI Task Suggestions")
+st.caption("Let Gemini review your pet's profile and suggest tasks you may have missed.")
+
+owner = st.session_state.owner
+if not owner or not owner.pets:
+    st.info("Add at least one pet above to get AI-powered task suggestions.")
+else:
+    pet_names = [p.name for p in owner.pets]
+    suggest_pet_name = st.selectbox("Get suggestions for", pet_names, key="suggest_pet")
+
+    if st.button("Ask Gemini for suggestions", type="secondary"):
+        pet = owner.get_pet(suggest_pet_name)
+        with st.spinner(f"Asking Gemini for {pet.name}..."):
+            suggestions = suggest_tasks(pet)
+        st.session_state.suggestions = suggestions
+        st.session_state.suggest_pet_name = suggest_pet_name
+
+    if st.session_state.suggestions and st.session_state.suggest_pet_name:
+        suggestions     = st.session_state.suggestions
+        target_pet_name = st.session_state.suggest_pet_name
+
+        avg_conf = sum(s["confidence"] for s in suggestions) / len(suggestions)
+        st.success(
+            f"{len(suggestions)} suggestions for **{target_pet_name}** "
+            f"— avg confidence {avg_conf:.0%}"
+        )
+
+        selected = []
+        for i, s in enumerate(suggestions):
+            conf = s.get("confidence", 0.0)
+            if conf >= 0.8:
+                badge = ":green[High]"
+            elif conf >= 0.5:
+                badge = ":orange[Medium]"
+            else:
+                badge = ":red[Low]"
+
+            col_chk, col_info = st.columns([1, 8])
+            with col_chk:
+                accept = st.checkbox("", key=f"accept_{i}", value=True)
+            with col_info:
+                st.markdown(
+                    f"**{s['name']}** &nbsp;|&nbsp; {s['duration_minutes']} min "
+                    f"&nbsp;|&nbsp; `{s['priority']}` priority "
+                    f"&nbsp;|&nbsp; {s['frequency']} "
+                    f"&nbsp;|&nbsp; Confidence: {badge} ({conf:.0%})"
+                )
+            if accept:
+                selected.append(s)
+
+        if st.button("Add selected tasks to schedule", type="primary", key="add_ai_tasks"):
+            pet   = owner.get_pet(target_pet_name)
+            added = 0
+            for s in selected:
+                try:
+                    pet.add_task(CareTask(
+                        name=s["name"],
+                        duration_minutes=int(s["duration_minutes"]),
+                        priority=s["priority"],
+                        category=s.get("category", "other"),
+                        frequency=s.get("frequency", "daily"),
+                    ))
+                    added += 1
+                except ValueError as e:
+                    st.warning(f"Skipped '{s['name']}': {e}")
+            st.success(f"Added {added} task(s) to {target_pet_name}.")
+            st.session_state.suggestions = []
+            st.session_state.suggest_pet_name = None
+            st.session_state.scheduler = None
+
+    elif st.session_state.get("suggest_pet_name") and not st.session_state.suggestions:
+        st.warning("No suggestions returned. Check your GEMINI_API_KEY or see pawpal_rag.log for details.")
+
+st.divider()
+
+# ---------------------------------------------------------------------------
+# Section 5: Generate schedule
+# ---------------------------------------------------------------------------
+st.subheader("5. Generate Today's Schedule")
 
 PRIORITY_ICON = {"high": "🔴", "medium": "🟡", "low": "🟢"}
 

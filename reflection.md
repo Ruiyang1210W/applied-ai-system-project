@@ -109,24 +109,30 @@ I verify the diagram on https://mermaid.live/ to check if they are all correct.
 
 ## 4. Testing and Verification
 
-**a. What you tested**
+### Scheduler tests (`tests/test_pawpal.py`) — 37 tests
 
-- What behaviors did you test?
-Tasks fitting into the time budget (including exact fit and one-minute-over edge cases)
-Priority sorting — high before medium before low, no matter what order tasks were added
-Recurring tasks — daily creates a new one tomorrow, weekly in 7 days, as-needed creates nothing
-Conflict detection — overlapping time windows get flagged, back-to-back ones don't
-Filtering — by pet name and by done/pending status
-Edge cases — owner with no pets, pet with no tasks, zero minutes available, completing a task twice
+Covers: time budget fitting, priority sort order, recurring task creation (daily/weekly/as-needed), conflict detection, filtering by pet and status, and edge cases (no pets, no tasks, zero minutes, completing the same task twice).
 
-- Why were these tests important?
-These are the kinds of mistakes that only show up when you actually check, so having automated tests means you catch them before the user does.
-**b. Confidence**
+**Result:** 37/37 passed. Confidence: 4/5 — core logic is solid; conflict checker is O(n²) which is fine at daily pet-care scale.
 
-- How confident are you that your scheduler works correctly?
-4/5
-- What edge cases would you test next if you had more time?
-A task whose duration is longer than the entire day
+---
+
+### RAG pipeline tests (`tests/test_rag.py`) — 19 tests, 3 groups
+
+**Group 1 — Retriever (7 tests)**
+Tests that `retrieve()` returns the right guidelines for each species, that unknown species fall back to general guidance, that condition-flag keywords (hip, diabetic) add the correct extra docs, and that age group boundaries map correctly.
+
+**Group 2 — Guardrails / Validation (8 tests)**
+Tests that `validate_suggestions()` rejects zero, negative, and over-max durations; rejects invalid priority values; caps output at `MAX_SUGGESTIONS`; and clamps confidence scores to [0.0, 1.0].
+
+**Group 3 — End-to-end with mocked Claude (4 tests)**
+Tests the full `suggest_tasks()` flow without hitting the real API. Verifies that a successful mock call returns the expected list, all confidence values are in range, an API failure returns `[]` instead of crashing, and invalid items in the mock response are filtered out before being returned.
+
+**Result:** 19/19 passed in 0.11s. **Total: 56/56 tests passing.**
+
+**Testing summary:** The RAG pipeline tests don't require a live API key — the Claude call is mocked so they run offline and deterministically. One honest gap: there are no tests for response consistency across real API calls (does Claude suggest the same tasks on every run?). That would require a live key and a separate evaluation script.
+
+**What I learned:** Isolating `call_claude()` as its own function made mocking trivial and kept tests fast. Validating AI output with explicit bounds (duration, priority, confidence clamp) before it touches the scheduler is what prevents a bad API response from corrupting the user's data.
 
 ---
 
