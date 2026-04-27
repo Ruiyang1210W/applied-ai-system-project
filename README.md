@@ -192,7 +192,7 @@ On the engineering side: structured outputs (asking Gemini to return JSON with s
 
 ## Video Walkthrough
 
-[Loom demo link — add after recording]
+https://youtu.be/hnZ98wS6ay0
 
 ---
 
